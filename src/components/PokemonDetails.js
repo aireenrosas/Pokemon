@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
     ActivityIndicator, 
     Alert, 
@@ -7,6 +7,7 @@ import {
     View, 
     Text,
     SafeAreaView,
+    ScrollView,
 } from 'react-native';
 import Carousel from 'react-native-snap-carousel';
 import { useQuery } from 'react-query';
@@ -15,6 +16,9 @@ import { PokeAPI_URL } from '../constants/constants'
 
 function PokemonDetails(props) {
     const {id} = props.route.params;
+    const [details, setDetails] = useState(true);
+    const [status, setStatus] = useState(false);
+    const [moves, setMoves] = useState(false);
     
     const fetchDetails = () => {
         return fetch(`${PokeAPI_URL}/pokemon/${id}`).then(res => res.json());
@@ -31,6 +35,21 @@ function PokemonDetails(props) {
     Object.entries(data?.sprites)
       .filter(([key, value]) => value !== null && key !== 'other' && key !== 'versions')
       .map(([key, value]) => ({ title: key, url: value })): [];
+
+      const ability = data.abilities.map((value, index) => ({
+        key: index,
+        name: value.ability.name
+      }));    
+      
+    const type = data.types.map((value, index) => ({
+        key: index,
+        name: value.type.name
+      }));
+
+    const move = data.moves.map((value, index) => ({
+        key: index,
+        name: value.move.name
+    }));
 
     return (
         <SafeAreaView style={pokemonStyles.container}>
@@ -59,29 +78,77 @@ function PokemonDetails(props) {
             <View style={{flexDirection: "row" }}>
                 <View style={pokemonStyles.button}>
                     <Button
-                        title="Detalles"
+                        title="Details"
                         color="#15cad4"
-                        onPress={() => Alert.alert('Simple Button pressed')}
+                        onPress={()=>{
+                            setDetails(true), 
+                            setStatus(false),
+                            setMoves(false)
+                        }}
                     />
                 </View>   
                 <View style={pokemonStyles.button}>
                     <Button
                         title="Estado"
                         color="#15d4a4"
-                        onPress={() => Alert.alert('Simple Button pressed')}
+                        onPress={() => {
+                            setStatus(true), 
+                            setDetails(false),
+                            setMoves(false)
+                        }}
                     />
                 </View>   
                 <View style={pokemonStyles.button}>
                     <Button
                         title="Movimiento"
                         color="#1591d4"
-                        onPress={() => Alert.alert('Simple Button pressed')}
+                        onPress={() => {
+                            setMoves(true),
+                            setDetails(false),
+                            setStatus(false)
+                        }}
                     />
                 </View>            
             </View>   
-            <View>
-                <Text>Hola</Text>
-            </View>         
+            {details? (
+                <View style={{flexDirection: "row" }}>
+                    <View style={pokemonStyles.center}>
+                        <Text style={pokemonStyles.title1}>Abilities</Text>
+                        {ability.map(e => (
+                            <Text key={e.key}>{e.name}</Text>
+                        ))}
+                    </View>
+                    <View style={pokemonStyles.center}>
+                        <Text style={pokemonStyles.title1}>Types</Text>
+                        {type.map(e => (
+                            <Text key={e.key}>{e.name}</Text>
+                        ))}
+                    </View>  
+                </View> 
+            ):<></>}
+            {status? (
+                <View style={{flexDirection: "row" }}>
+                    <View style={pokemonStyles.center}>
+                        <Text style={pokemonStyles.title1}>Base Experience</Text>
+                        <Text>{data?.base_experience}</Text>
+                    </View>
+                    <View style={pokemonStyles.center}>
+                        <Text style={pokemonStyles.title1}>Height</Text>
+                        <Text>{data?.height} m</Text>
+                    </View>  
+                    <View style={pokemonStyles.center}>
+                        <Text style={pokemonStyles.title1}>Weight</Text>
+                        <Text>{data?.weight} kg</Text>
+                    </View> 
+                </View> 
+            ):<></>}
+            {moves? (
+                <ScrollView style={{marginHorizontal: 20,}}>
+                    {move.map(e => (
+                        <Text key={e.key}>{e.name}</Text>
+                    ))} 
+                </ScrollView>                
+            ):<></>}                    
         </SafeAreaView>        
       );
 }

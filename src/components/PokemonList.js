@@ -12,7 +12,7 @@ const fetchData = () => {
 export function PokemonList() {
     const { data, error, isLoading } = useQuery('myData', fetchData);
 
-    if (isLoading) return <ActivityIndicator  />;
+    if (isLoading) return <ActivityIndicator/>;
     if (error) return Alert.alert(error);
 
     const getId =(url) => {

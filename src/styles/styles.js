@@ -54,6 +54,11 @@ const pokemonStyles = StyleSheet.create({
         paddingLeft:10, 
         paddingRight:10,
         paddingBottom: 20
+    },
+    center: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     }
 })
 
